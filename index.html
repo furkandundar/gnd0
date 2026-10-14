@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#060911">
+    <title>GND0 — Ground Zero Hardware Bench</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="brand">
+            <div class="brand-logo" style="background: #060911; border: 1.5px solid #06b6d4;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="4" r="2" fill="#10b981" />
+                    <line x1="12" y1="6" x2="12" y2="12" stroke="#06b6d4" stroke-width="2.2" stroke-linecap="round" />
+                    <line x1="4" y1="12" x2="20" y2="12" stroke="#06b6d4" stroke-width="2.2" stroke-linecap="round" />
+                    <line x1="7" y1="16" x2="17" y2="16" stroke="#06b6d4" stroke-width="2.2" stroke-linecap="round" />
+                    <line x1="10" y1="20" x2="14" y2="20" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" />
+                </svg>
+            </div>
+            <div class="brand-text">
+                <h1>GND0</h1>
+                <span>0.00V REFERENCE BENCH</span>
+            </div>
+        </div>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('divider', this)">
+                <span class="icon">⚡</span><span>Bölücü</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('analog', this)">
+                <span class="icon">∿</span><span>Op-Amp/RC</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('smd', this)">
+                <span class="icon">▣</span><span>SMD Kod</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('pinout', this)">
+                <span class="icon">⏚</span><span>Pinout</span>
+            </button>
+        </nav>
+
+        <div class="status-pill">
+            <span class="status-dot"></span> GND: 0V
+        </div>
+    </header>
+
+    <!-- MODÜL 1: GERİLİM BÖLÜCÜ -->
+    <main id="tab-divider" class="workspace active">
+        <section class="panel schematic-panel">
+            <div class="panel-title">Devre Şeması (Gerilim Bölücü)</div>
+            <div class="svg-container">
+                <svg width="260" height="300" viewBox="0 0 260 300">
+                    <circle cx="100" cy="30" r="5" fill="#38bdf8" />
+                    <text x="115" y="35" fill="#38bdf8" font-family="monospace" font-weight="bold" font-size="14"
+                        id="svg-vin">Vin: 12.0V</text>
+                    <line x1="100" y1="35" x2="100" y2="70" stroke="#94a3b8" stroke-width="2" />
+                    <rect x="85" y="70" width="30" height="60" fill="#1e293b" stroke="#38bdf8" stroke-width="2"
+                        rx="4" />
+                    <text x="40" y="105" fill="#f8fafc" font-family="monospace" font-size="13"
+                        font-weight="bold">R1</text>
+                    <text x="125" y="105" fill="#10b981" font-family="monospace" font-size="13" id="svg-r1">10 kΩ</text>
+                    <line x1="100" y1="130" x2="100" y2="170" stroke="#94a3b8" stroke-width="2" />
+                    <circle cx="100" cy="150" r="4" fill="#10b981" />
+                    <line x1="100" y1="150" x2="165" y2="150" stroke="#10b981" stroke-width="2" stroke-dasharray="4" />
+                    <circle cx="165" cy="150" r="4" fill="#10b981" />
+                    <text x="175" y="155" fill="#10b981" font-family="monospace" font-weight="bold" font-size="14"
+                        id="svg-vout">Vout: 3.3V</text>
+                    <rect x="85" y="170" width="30" height="60" fill="#1e293b" stroke="#38bdf8" stroke-width="2"
+                        rx="4" />
+                    <text x="40" y="205" fill="#f8fafc" font-family="monospace" font-size="13"
+                        font-weight="bold">R2</text>
+                    <text x="125" y="205" fill="#10b981" font-family="monospace" font-size="13" id="svg-r2">3.9
+                        kΩ</text>
+                    <line x1="100" y1="230" x2="100" y2="265" stroke="#94a3b8" stroke-width="2" />
+                    <line x1="80" y1="265" x2="120" y2="265" stroke="#94a3b8" stroke-width="2" />
+                    <line x1="87" y1="272" x2="113" y2="272" stroke="#94a3b8" stroke-width="2" />
+                    <line x1="94" y1="279" x2="106" y2="279" stroke="#94a3b8" stroke-width="2" />
+                </svg>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-title">Parametreler & Standart Direnç Bulucu</div>
+            <div class="input-row">
+                <div class="input-group" style="flex:1">
+                    <label>Giriş Gerilimi (Vin - V)</label>
+                    <input type="number" id="vin" value="12" step="0.1" oninput="calculateDivider()">
+                </div>
+                <div class="input-group" style="flex:1">
+                    <label>Hedef Çıkış (Vout - V)</label>
+                    <input type="number" id="vout" value="3.3" step="0.1" oninput="calculateDivider()">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Standart Direnç Serisi</label>
+                <select id="series" onchange="calculateDivider()">
+                    <option value="E12">E12 Serisi (%10 - En Yaygın)</option>
+                    <option value="E24">E24 Serisi (%5 - Hassas)</option>
+                </select>
+            </div>
+            <div class="panel-title" style="margin-top: 20px;">En Uygun Standart Çiftler</div>
+            <div id="results" class="results-list"></div>
+        </section>
+    </main>
+
+    <!-- MODÜL 2: OP-AMP & RC FİLTRE TASARIMCISI -->
+    <main id="tab-analog" class="workspace">
+        <section class="panel schematic-panel">
+            <div class="panel-title">Analog Devre Topolojisi</div>
+            <div class="svg-container" id="analog-svg-box"></div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-title">Op-Amp Kazanç & RC Kesim Frekansı Çözücü</div>
+            <div class="input-group">
+                <label>Devre Tipi Seçin</label>
+                <select id="analog-mode" onchange="updateAnalogUI()">
+                    <option value="non-inv">Evirmeyen Op-Amp (Non-Inverting: Av = 1 + Rf/Rin)</option>
+                    <option value="inv">Eviren Op-Amp (Inverting: Av = -Rf/Rin)</option>
+                    <option value="rc-lpf">RC Alçak Geçiren Filtre (fc = 1 / 2πRC)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label id="analog-input-label">Hedef Kazanç (Mutlak Av - V/V)</label>
+                <input type="number" id="analog-target" value="4.7" step="0.1" oninput="calculateAnalog()">
+            </div>
+
+            <div class="panel-title" style="margin-top: 20px;">Standart E12 Komponent Önerileri</div>
+            <div id="analog-results" class="results-list"></div>
+        </section>
+    </main>
+
+    <!-- MODÜL 3: SMD DEKODER & KILIF REHBERİ -->
+    <main id="tab-smd" class="workspace">
+        <section class="panel schematic-panel">
+            <div class="panel-title">SMD Fiziksel Kılıf & Footprint Önizleme</div>
+            <div class="svg-container">
+                <svg width="280" height="240" viewBox="0 0 280 240">
+                    <rect x="45" y="75" width="45" height="90" fill="#b45309" stroke="#f59e0b" stroke-width="1.5"
+                        rx="4" />
+                    <rect x="190" y="75" width="45" height="90" fill="#b45309" stroke="#f59e0b" stroke-width="1.5"
+                        rx="4" />
+                    <rect x="70" y="85" width="140" height="70" fill="#111827" stroke="#475569" stroke-width="2" />
+                    <rect x="65" y="85" width="20" height="70" fill="#cbd5e1" />
+                    <rect x="195" y="85" width="20" height="70" fill="#cbd5e1" />
+                    <text x="140" y="128" fill="#f8fafc" font-family="monospace" font-size="26" font-weight="bold"
+                        text-anchor="middle" id="svg-smd-code">01C</text>
+                    <line x1="65" y1="185" x2="215" y2="185" stroke="#38bdf8" stroke-width="1.5" />
+                    <text x="140" y="205" fill="#38bdf8" font-family="monospace" font-size="13" text-anchor="middle"
+                        id="svg-smd-dim">2.0mm x 1.25mm (0805)</text>
+                    <text x="140" y="45" fill="#10b981" font-family="monospace" font-size="14" font-weight="bold"
+                        text-anchor="middle" id="svg-smd-power">Maks Güç: 0.125W (1/8W)</text>
+                </svg>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-title">SMD Direnç Kod Çözücü (EIA-96 & Standart)</div>
+            <div class="input-row">
+                <div class="input-group" style="flex:1">
+                    <label>SMD Kodu (Örn: 472, 4R7, 01C, 68X)</label>
+                    <input type="text" id="smd-input" value="01C" maxlength="4" oninput="decodeSMD()"
+                        style="text-transform:uppercase;">
+                </div>
+                <div class="input-group" style="flex:1">
+                    <label>SMD Kılıf Boyutu (Imperial)</label>
+                    <select id="smd-pkg" onchange="decodeSMD()">
+                        <option value="0402">0402 (Metrik 1005)</option>
+                        <option value="0603">0603 (Metrik 1608)</option>
+                        <option value="0805" selected>0805 (Metrik 2012)</option>
+                        <option value="1206">1206 (Metrik 3216)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="big-readout">
+                <div class="val" id="smd-result-val">10 kΩ</div>
+                <div class="sub" id="smd-result-tol">EIA-96 Standardı • ±%1 Tolerans</div>
+            </div>
+            <div class="lab-note" id="smd-lab-note"></div>
+        </section>
+    </main>
+
+    <!-- MODÜL 4: ÇEVRİMDIŞI PINOUT & IC REHBERİ -->
+    <main id="tab-pinout" class="workspace">
+        <section class="panel schematic-panel">
+            <div class="panel-title">IC Bacak Haritası (Top View)</div>
+            <div class="svg-container" id="ic-svg-box"></div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-title">Çevrimdışı Entegre & Modül Seçimi</div>
+            <div class="input-group">
+                <label>Komponent Seçin</label>
+                <select id="ic-select" onchange="renderPinout()">
+                    <option value="MAX485">MAX485 - RS-485 Haberleşme Transceiver</option>
+                    <option value="NE555">NE555 - Hassas Zamanlayıcı (Timer)</option>
+                    <option value="LM358">LM358 - Çiftli İşlemsel Yükselteç (Dual Op-Amp)</option>
+                    <option value="TP4056">TP4056 - 1A Li-Ion Batarya Şarj Entegresi</option>
+                </select>
+            </div>
+            <div id="pinout-details" class="results-list"></div>
+            <div id="ic-lab-note" class="lab-note"></div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
